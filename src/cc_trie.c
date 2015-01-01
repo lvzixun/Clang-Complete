@@ -99,7 +99,7 @@ cc_trie_insert(struct cc_trie* tp, const char* str, unsigned int ud) {
   char c;
   uint32_t cur_pos = tp->root;
   for(; (c=*str++); ) {
-    if(c2idx(c) > 0){
+    if(c2idx(c) >= 0){
       cur_pos = node_insert(tp, cur_pos, c);
     }
   }
@@ -182,6 +182,8 @@ node_insert(struct cc_trie* tp, uint32_t node_pos, char c) {
   return pos;
 }
 
+
+// for test
 static void
 _tdump(struct cc_trie* tp, struct cc_node* node, uint32_t pos) {
   printf("pos[%d] count[%d] ud[%d] has_ud[%d]\n", pos, node->count, node->ud, node->has_ud);

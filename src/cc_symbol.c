@@ -4,10 +4,15 @@
 
 #include "cc_symbol.h"
 #include "cc_result.h"
+#include "cc_trie.h"
+#include "cc_resultcache.h"
 
 struct cc_symbol {
   CXTranslationUnit tu;
   char* filename;
+
+  struct cc_trie* tp;
+  struct cc_resultcache* cache;
 };
 
 
@@ -20,11 +25,14 @@ struct cc_symbol {
 
 
 struct cc_symbol* 
-cc_symbol_create(const char* filename, const char* opt[], int opt_len, struct CXUnsavedFile*  unsaved_files, unsigned num_unsaved_files) {
+cc_symbol_new(const char* filename, const char* opt[], int opt_len, struct CXUnsavedFile*  unsaved_files, unsigned num_unsaved_files) {
   struct cc_symbol* ret = (struct cc_symbol*)malloc(sizeof(*ret));
   CXIndex index = clang_createIndex(1, 0);
   ret->tu =  clang_parseTranslationUnit(index, filename, opt, opt_len, unsaved_files, num_unsaved_files, _PARSE_OPTIONS);
   ret->filename = strdup(filename);
+
+  ret->tp = cc_trie_new();
+  ret->cache = cc_resultcache_new();
   return ret;
 }
 
@@ -32,6 +40,9 @@ cc_symbol_create(const char* filename, const char* opt[], int opt_len, struct CX
 void 
 cc_symbol_free(struct cc_symbol* sp) {
   clang_disposeTranslationUnit(sp->tu);
+  cc_trie_free(sp->tp);
+  cc_resultcache_free(sp->cache);
+
   free(sp->filename);
   free(sp);
 }
@@ -59,7 +70,7 @@ cc_symbol_diagnostic(struct cc_symbol* sp, diagnostic_visit func, void* ud) {
 
 struct cc_result*
 cc_symbol_complete_at(struct cc_symbol* sp, unsigned int line, unsigned int col, struct CXUnsavedFile* unsaved_files, unsigned int num_unsaved_files) {
-  return cc_reslut_create(sp->tu, sp->filename, line, col, unsaved_files, num_unsaved_files);
+  return cc_result_new(sp->tu, sp->tp, sp->cache, sp->filename, line, col, unsaved_files, num_unsaved_files);
 }
 
 
