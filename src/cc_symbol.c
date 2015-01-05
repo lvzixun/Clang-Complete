@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <clang-c/Index.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,6 +37,10 @@ cc_symbol_new(const char* filename, const char* opt[], int opt_len, struct CXUns
   return ret;
 }
 
+CXTranslationUnit
+cc_symbol_tu(struct cc_symbol* sp) {
+  return sp->tu;
+}
 
 void 
 cc_symbol_free(struct cc_symbol* sp) {
@@ -54,24 +59,23 @@ cc_symbol_reparse(struct cc_symbol* sp, struct CXUnsavedFile*  unsaved_files, un
 }
 
 
-void
-cc_symbol_diagnostic(struct cc_symbol* sp, diagnostic_visit func, void* ud) {
-  CXDiagnosticSet set = clang_getDiagnosticSetFromTU(sp->tu);
-  unsigned num = clang_getNumDiagnosticsInSet(set);
-  unsigned i;
-  for(i=0; i<num; i++) {
-    CXDiagnostic c = clang_getDiagnosticInSet(set, i);
-    CXString cs = clang_formatDiagnostic(c, CXDiagnostic_DisplaySourceLocation | CXDiagnostic_DisplayColumn);
-    func(clang_getCString(cs), ud);
-  }
-  clang_disposeDiagnosticSet(set);
-}
+// void
+// cc_symbol_diagnostic(struct cc_symbol* sp, diagnostic_visit func, void* ud) {
+//   CXDiagnosticSet set = clang_getDiagnosticSetFromTU(sp->tu);
+//   unsigned num = clang_getNumDiagnosticsInSet(set);
+//   unsigned i;
+//   for(i=0; i<num; i++) {
+//     CXDiagnostic c = clang_getDiagnosticInSet(set, i);
+//     CXString cs = clang_formatDiagnostic(c, CXDiagnostic_DisplaySourceLocation | CXDiagnostic_DisplayColumn);
+//     func(clang_getCString(cs), ud);
+//   }
+//   clang_disposeDiagnosticSet(set);
+// }
+
 
 
 struct cc_result*
 cc_symbol_complete_at(struct cc_symbol* sp, unsigned int line, unsigned int col, struct CXUnsavedFile* unsaved_files, unsigned int num_unsaved_files) {
   return cc_result_new(sp->tu, sp->tp, sp->cache, sp->filename, line, col, unsaved_files, num_unsaved_files);
 }
-
-
 

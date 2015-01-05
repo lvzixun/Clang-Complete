@@ -47,8 +47,8 @@ cc_result_free(struct cc_result* rp) {
 }
 
 
-static const char*
-_2chunk_head(CXCompletionString cs) {
+const char*
+cc_result_entryname(CXCompletionString cs) {
   int num = clang_getNumCompletionChunks(cs);
   if(clang_getCompletionAvailability(cs) == CXAvailability_Available && num >= 1) {
     int i;
@@ -71,9 +71,9 @@ _insert(struct cc_result* rp, unsigned int entry_idx) {
   assert(entry_idx < rp->result->NumResults);
   CXCompletionResult* entry = &rp->result->Results[entry_idx];
   CXCompletionString cs = entry->CompletionString;
-  const char* str = _2chunk_head(cs);
+  const char* str = cc_result_entryname(cs);
   if (str) {
-    printf("%s\n", str);
+    // printf("%s\n", str);
     cc_trie_insert(rp->ref_tp, str, entry_idx);
   }
 }
@@ -110,7 +110,7 @@ cc_result_dump(struct cc_result* rp,  struct match_result result) {
   for(i=0; i<result.size; i++) {
     CXCompletionResult* item = result.table[i];
     CXCompletionString cs = item->CompletionString;
-    printf("[%u] %s\n", i, _2chunk_head(cs));
+    printf("[%u] %s\n", i, cc_result_entryname(cs));
   }
 }
 

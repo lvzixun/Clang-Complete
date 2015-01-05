@@ -1,4 +1,3 @@
-#include <python.h>
 #include <clang-c/Index.h>
 #include <stdio.h>
 
@@ -51,10 +50,63 @@ py_result_free(struct cc_result* rp) {
 
 EXPORT struct match_result
 py_result_match(struct cc_result* rp, const char* prefix) {
-  printf("py_result_match: %p prefix: %s\n", rp, prefix);
-
+  // printf("py_result_match: %p prefix: %s\n", rp, prefix);
   struct match_result ret = cc_result_match(rp, prefix);
-  cc_result_dump(rp, ret);  // for test
+  // cc_result_dump(rp, ret);  // for test
   return ret;
 }
+
+EXPORT const char*
+py_cs_entryname(CXCompletionString cs) {
+  return cc_result_entryname(cs);
+}
+
+EXPORT unsigned int
+py_cs_count(CXCompletionString cs) {
+  return clang_getNumCompletionChunks(cs);
+}
+
+struct cc_trunk {
+  enum CXCompletionChunkKind kind;
+  const char* value;
+};
+
+EXPORT struct cc_trunk
+py_cs_trunk(CXCompletionString cs, unsigned int idx) {
+  struct cc_trunk trunk = {
+    .kind = clang_getCompletionChunkKind(cs, idx),
+    .value = NULL,
+  };
+
+  CXString str = clang_getCompletionChunkText(cs, idx);
+  trunk.value = clang_getCString(str);
+  return trunk;
+}
+
+
+EXPORT CXDiagnosticSet
+py_diagnostic_new(struct cc_symbol* sp) {
+  CXDiagnosticSet set = clang_getDiagnosticSetFromTU(cc_symbol_tu(sp));
+  return set;
+}
+
+EXPORT void
+py_diagnostic_free(CXDiagnosticSet set) {
+  clang_disposeDiagnosticSet(set);
+}
+
+
+EXPORT unsigned int
+py_diagnostic_num(CXDiagnosticSet set) {
+  return clang_getNumDiagnosticsInSet(set);
+}
+
+
+EXPORT const char*
+py_diagnostic(CXDiagnosticSet set, unsigned int idx) {
+  CXDiagnostic c = clang_getDiagnosticInSet(set, idx);
+  CXString cs = clang_formatDiagnostic(c, CXDiagnostic_DisplaySourceLocation | CXDiagnostic_DisplayColumn);
+  return clang_getCString(cs);
+}
+
 

@@ -125,11 +125,9 @@ _dump_node(struct cc_trie* tp, struct cc_node* root, trie_visit func, void* ud) 
 
 void
 cc_trie_match(struct cc_trie* tp, const char* prefix, trie_visit func, void* ud) {
-  if(prefix ==NULL || *prefix == 0) return;
-
   char c;
   struct cc_node* cur = pos2node(tp, tp->root);
-  for(; (c=*prefix++); ) {
+  for(; (prefix && (c=*prefix++)); ) {
     struct cc_node* next = node_next(tp, cur, c);
     if(!next) return;
     cur = next;
