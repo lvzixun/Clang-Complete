@@ -25,7 +25,7 @@ class CCTrunk(Structure):
     return CXCompletionChunkKind(self._kind) 
 
 
-digst_regex = re.compile("^(.+?):(\d+):(\d+):.+$")
+digst_regex = re.compile("^(.+?):(\d+):(\d+): (.+?):.*$")
 class CXDiagnosticSet(Structure):
   _fields_ = [("_point", c_void_p)]
 
@@ -47,9 +47,9 @@ class CXDiagnosticSet(Structure):
       raise StopIteration
     else:
       s = libcc_diagnostic(self, self.it).decode("utf-8")
-      (filename, line, col) = digst_regex.match(s).groups()
+      (filename, line, col, error_type) = digst_regex.match(s).groups()
       self.it += 1
-      return self.it - 1, (filename, line, col, s)
+      return self.it - 1, (filename, int(line), int(col), error_type, s)
 
   @property
   def length(self):

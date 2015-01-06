@@ -176,8 +176,11 @@ class CCAutoComplete(sublime_plugin.EventListener):
     sym = Complete.get_symbol(file_name)
     sym.reparse()
     digst = sym.diagnostic()
-    output = "\n".join([err for _, (_, _, _, err) in digst])
+    
+    output = "\n".join([err for _, (_, _, _, _, err) in digst])
     clang_error_panel.set_data(output)
+    clang_error_panel.error_marks(view, digst)
+
     window = view.window()
     if not window is None and len(digst) > 1:
       window.run_command("clang_toggle_panel", {"show": True})

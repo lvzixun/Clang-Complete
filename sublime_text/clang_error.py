@@ -24,6 +24,8 @@ def is_view_visible(view, window=None):
     return ret
 
 class ClangErrorPanel(object):
+    markers = {'warning': 'comment', 'error': 'invalid'}
+
     def __init__(self):
         self.view = None
         self.data = ""
@@ -51,15 +53,41 @@ class ClangErrorPanel(object):
         if window == None:
             window = sublime.active_window()
         if not self.is_visible(window):
-            self.view = window.get_output_panel("clangcomplete")
+            self.view = window.get_output_panel("cc")
             self.view.settings().set("result_file_regex", "^(..[^:\n]*):([0-9]+):?([0-9]+)?:? (.*)$")
             self.view.set_syntax_file('Packages/cc/ErrorPanel.tmLanguage')
         self.flush()
 
-        window.run_command("show_panel", {"panel": "output.clangcomplete"})
+        window.run_command("show_panel", {"panel": "output.cc"})
 
     def close(self):
-        sublime.active_window().run_command("hide_panel", {"panel": "output.clangcomplete"})
+        sublime.active_window().run_command("hide_panel", {"panel": "output.cc"})
+
+
+    def error_marks(self, view, digst):
+        self.erase_error_marks(view)
+
+        outlines = {'warning': [], 'error': []}
+        for i, (filename, line, col, error_type, info) in digst:
+            print(error_type, line)
+            if not outlines[error_type] is None:
+                outlines[error_type].append(view.full_line(view.text_point(line-1, 0)))
+
+        for line_type in outlines:
+            if not outlines[line_type] is None:
+                args = [
+                    'sublimeclang-outlines-{0}'.format(line_type),
+                    outlines[line_type],
+                    self.markers[line_type],
+                    'dot',
+                    sublime.DRAW_OUTLINED
+                ]
+                view.add_regions(*args)
+
+
+    def erase_error_marks(self, view):
+        view.erase_regions('cc-outlines-error')
+        view.erase_regions('cc-outlines-warning')
 
 
 clang_error_panel = ClangErrorPanel()
