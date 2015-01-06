@@ -198,6 +198,9 @@ class CCAutoComplete(sublime_plugin.EventListener):
       return
 
     if self.complete_result != None:
+      ret = None
+      if len(self.complete_result) == 0:
+        return None
       ret = (self.complete_result, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
       self.complete_result = None
       return ret
