@@ -3,6 +3,7 @@ import re
 import os
 import sublime, sublime_plugin
 
+from cc.clang_error import *
 from cc.cc import *
 
 opt = [
@@ -118,7 +119,7 @@ class Complete(object):
   member_regex = re.compile(r"(([a-zA-Z_]+[0-9_]*)|([\)\]])+)((\.)|(->))$")
 
   @staticmethod
-  def get_symbol(file_name, unsaved_files):
+  def get_symbol(file_name, unsaved_files=[]):
     self = Complete    
     if file_name in self.symbol_map:
       return self.symbol_map[file_name]
@@ -158,6 +159,7 @@ class CCAutoComplete(sublime_plugin.EventListener):
     if can_complete(view) and Complete.is_member_completion(view):
       self.per_complete()
 
+
   def per_complete(self):
     sublime.active_window().run_command("hide_auto_complete")
     self.is_trigger = True
@@ -165,11 +167,27 @@ class CCAutoComplete(sublime_plugin.EventListener):
       sublime.active_window().run_command("auto_complete")
     sublime.set_timeout(hack2, 1)
   
+
+  def on_post_save_async(self, view):
+    if not can_complete(view):
+      return 
+
+    file_name = view.file_name()
+    sym = Complete.get_symbol(file_name)
+    sym.reparse()
+    digst = sym.diagnostic()
+    output = "\n".join([err for _, (_, _, _, err) in digst])
+    clang_error_panel.set_data(output)
+    window = view.window()
+    if not window is None and len(digst) > 1:
+      window.run_command("clang_toggle_panel", {"show": True})
+
   
   def on_query_completions(self, view, prefix, locations):
     line, col = view.rowcol(locations[0])
     line += 1
-    col += 1
+    if len(prefix) == 0:
+      col += 1
 
     file_name = view.file_name()
 

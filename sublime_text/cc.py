@@ -1,6 +1,7 @@
 from ctypes import cdll, Structure, POINTER, c_char_p, c_void_p, c_uint, c_bool, c_ulong, c_int
 from cc.clang import CXUnsavedFile, CXCompletionChunkKind, CXCursorKind
 import os
+import re
 
 
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -23,6 +24,8 @@ class CCTrunk(Structure):
   def kind(self):
     return CXCompletionChunkKind(self._kind) 
 
+
+digst_regex = re.compile("^(.+?):(\d+):(\d+):.+$")
 class CXDiagnosticSet(Structure):
   _fields_ = [("_point", c_void_p)]
 
@@ -36,13 +39,17 @@ class CXDiagnosticSet(Structure):
     self.it = 0
     return self
 
+  def __next__(self):
+    return self.next()
+
   def next(self):
     if self.it >= self.length:
       raise StopIteration
     else:
-      s = libcc_diagnostic(self, self.it)
+      s = libcc_diagnostic(self, self.it).decode("utf-8")
+      (filename, line, col) = digst_regex.match(s).groups()
       self.it += 1
-      return self.it - 1, s
+      return self.it - 1, (filename, line, col, s)
 
   @property
   def length(self):
@@ -97,6 +104,7 @@ class CXCompletionResult(Structure):
     if key >= self.length:
       raise IndexError
     return libcc_cs_trunk(self.CompletionString, key)
+
 
 
 class MatchResult(Structure):
@@ -219,6 +227,7 @@ class CCSymbol(object):
   def __del__(self):
     libcc_symbol_free(self.c_obj)
 
+
   def complete_at(self, line, col, unsaved_files = []):
     assert(line > 0)
     assert(col > 0)
@@ -226,7 +235,7 @@ class CCSymbol(object):
     c_result_obj = libcc_symbol_complete_at(self.c_obj, line, col, unsaved_files, num)
     return CCResult(c_result_obj)
 
-  def reparse(self, unsaved_files):
+  def reparse(self, unsaved_files=[]):
     unsaved_files, num = self.helper.to_file_list(unsaved_files)
     libcc_symbol_reparse(self.c_obj, unsaved_files, num)
 
@@ -251,7 +260,7 @@ def main():
     for j, trunk in v:
       print("  trunk: %s kind: %s" % (trunk.value, trunk.kind))
     print("==========")
-
+    
   # diagnostic
   # for i, err in symbol.diagnostic():
   #   print "[%d] %s" % (i, err)
@@ -260,5 +269,5 @@ def main():
 if __name__ == '__main__':
   main()
 
-__all__ = ["CCSymbol", "CCResult", "CXUnsavedFile", "CXCompletionChunkKind", "CXCursorKind"]
+__all__ = ["CCSymbol", "CCResult", "CXDiagnosticSet", "CXUnsavedFile", "CXCompletionChunkKind", "CXCursorKind"]
 
