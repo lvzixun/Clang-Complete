@@ -1,0 +1,6 @@
+[
+	{
+		"command": "clang_goto_def",
+        "keys": ["super+y"]
+	}
+]
