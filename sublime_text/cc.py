@@ -106,6 +106,22 @@ class CXCompletionResult(Structure):
     return libcc_cs_trunk(self.CompletionString, key)
 
 
+class CCdef(Structure):
+  _fields_ = [('_filename', c_char_p), ('line', c_uint), ('col', c_uint)]
+
+  @property
+  def filename(self):
+    return self._filename.decode('utf-8')
+
+  @property
+  def has(self):
+    return self.filename != ""
+
+  @property
+  def target(self):
+  	if not self.has: return None
+  	return "%s:%d:%d" % (self.filename, self.line, self.col)
+
 
 class MatchResult(Structure):
   _fields_ = [("table", POINTER(POINTER(CXCompletionResult))), ("size", c_uint)]
@@ -144,6 +160,10 @@ libcc_symbol_new.argtypes = [c_char_p, POINTER(c_char_p), c_uint, POINTER(CXUnsa
 
 libcc_symbol_free = libcc.py_symbol_free
 libcc_symbol_free.argtypes = [POINTER(_cc_symbol)]
+
+libcc_symbol_def = libcc.py_symbol_def
+libcc_symbol_def.argtypes = [POINTER(_cc_symbol), c_char_p, c_uint, c_uint]
+libcc_symbol_def.restype = CCdef
 
 libcc_symbol_reparse = libcc.py_symbol_reparse
 libcc_symbol_reparse.argtypes = [POINTER(_cc_symbol), POINTER(CXUnsavedFile), c_uint]
@@ -185,6 +205,7 @@ libcc_diagnostic_count.argtypes = [CXDiagnosticSet]
 libcc_diagnostic = libcc.py_diagnostic
 libcc_diagnostic.restype = c_char_p
 libcc_diagnostic.argtypes = [CXDiagnosticSet, c_uint]
+
 
 
 class CCHelper(object):
@@ -243,31 +264,39 @@ class CCSymbol(object):
   def diagnostic(self):
     return libcc_diagnostic_new(self.c_obj)
 
+  def get_def(self, filename, line, col):
+    filename = filename.encode('utf-8')
+    return libcc_symbol_def(self.c_obj, filename, line, col)
 
-def main():
-  opt = [
-    "-Wall",
-    "-I/Users/zixunlv/codes/A2/src",
-  ]
 
-  symbol = CCSymbol("/Users/zixunlv/codes/clang-complete/t.c", opt)
-  result = symbol.complete_at(25, 3)
-  complete = result.match("fun")
+# def main():
+#   opt = [
+#     "-Wall",
+#     "-I/Users/zixunlv/codes/A2/src",
+#   ]
 
-  # complete
-  for i, name, v in complete:
-    print("[%d] name: %s type: %s  info: %s" % (i, name, v.kind, v.info))
-    for j, trunk in v:
-      print("  trunk: %s kind: %s" % (trunk.value, trunk.kind))
-    print("==========")
+#   filename = "/Users/zixunlv/codes/clang-complete/t.c"
+#   symbol = CCSymbol(filename, opt)
+#   result = symbol.complete_at(25, 3)
+#   complete = result.match("fun")
+
+#   # complete
+#   # for i, name, v in complete:
+#   #   print("[%d] name: %s type: %s  info: %s" % (i, name, v.kind, v.info))
+#   #   for j, trunk in v:
+#   #     print("  trunk: %s kind: %s" % (trunk.value, trunk.kind))
+#   #   print("==========")
     
-  # diagnostic
-  # for i, err in symbol.diagnostic():
-  #   print "[%d] %s" % (i, err)
+#   # diagnostic
+#   # for i, err in symbol.diagnostic():
+#   #   print "[%d] %s" % (i, err)
 
+#   # goto definition
+#   definition = symbol.get_def(filename, 21, 3)
+#   print(definition.filename, definition.line, definition.col, definition.has)
 
-if __name__ == '__main__':
-  main()
+# if __name__ == '__main__':
+#   main()
 
 __all__ = ["CCSymbol", "CCResult", "CXDiagnosticSet", "CXUnsavedFile", "CXCompletionChunkKind", "CXCursorKind"]
 

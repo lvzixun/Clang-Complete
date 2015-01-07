@@ -24,7 +24,7 @@ def is_view_visible(view, window=None):
     return ret
 
 class ClangErrorPanel(object):
-    markers = {'warning': 'comment', 'error': 'invalid'}
+    markers = {'warning': 'comment', 'error': 'invalid', 'fatal error': 'invalid'}
 
     def __init__(self):
         self.view = None
@@ -67,10 +67,10 @@ class ClangErrorPanel(object):
     def error_marks(self, view, digst):
         self.erase_error_marks(view)
 
-        outlines = {'warning': [], 'error': []}
+        outlines = {'warning': [], 'error': [], 'fatal error': []}
         for i, (filename, line, col, error_type, info) in digst:
             print(error_type, line)
-            if not outlines[error_type] is None:
+            if error_type in outlines:
                 outlines[error_type].append(view.full_line(view.text_point(line-1, 0)))
 
         for line_type in outlines:

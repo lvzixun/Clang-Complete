@@ -109,4 +109,16 @@ py_diagnostic(CXDiagnosticSet set, unsigned int idx) {
   return clang_getCString(cs);
 }
 
+EXPORT struct cc_def
+py_symbol_def(struct cc_symbol* sp, const char* filename, unsigned line, unsigned col) {
+	struct cc_def ret = {
+		.filename = "",
+		.line = 0,
+		.col = 0,
+	};
+
+	cc_symbol_def(sp, filename, line, col, &ret);
+	return  ret;
+}
+
 

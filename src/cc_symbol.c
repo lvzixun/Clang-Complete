@@ -59,18 +59,18 @@ cc_symbol_reparse(struct cc_symbol* sp, struct CXUnsavedFile*  unsaved_files, un
 }
 
 
-// void
-// cc_symbol_diagnostic(struct cc_symbol* sp, diagnostic_visit func, void* ud) {
-//   CXDiagnosticSet set = clang_getDiagnosticSetFromTU(sp->tu);
-//   unsigned num = clang_getNumDiagnosticsInSet(set);
-//   unsigned i;
-//   for(i=0; i<num; i++) {
-//     CXDiagnostic c = clang_getDiagnosticInSet(set, i);
-//     CXString cs = clang_formatDiagnostic(c, CXDiagnostic_DisplaySourceLocation | CXDiagnostic_DisplayColumn);
-//     func(clang_getCString(cs), ud);
-//   }
-//   clang_disposeDiagnosticSet(set);
-// }
+void
+cc_symbol_diagnostic(struct cc_symbol* sp, diagnostic_visit func, void* ud) {
+  CXDiagnosticSet set = clang_getDiagnosticSetFromTU(sp->tu);
+  unsigned num = clang_getNumDiagnosticsInSet(set);
+  unsigned i;
+  for(i=0; i<num; i++) {
+    CXDiagnostic c = clang_getDiagnosticInSet(set, i);
+    CXString cs = clang_formatDiagnostic(c, CXDiagnostic_DisplaySourceLocation | CXDiagnostic_DisplayColumn);
+    func(clang_getCString(cs), ud);
+  }
+  clang_disposeDiagnosticSet(set);
+}
 
 
 
@@ -79,3 +79,25 @@ cc_symbol_complete_at(struct cc_symbol* sp, unsigned int line, unsigned int col,
   return cc_result_new(sp->tu, sp->tp, sp->cache, sp->filename, line, col, unsaved_files, num_unsaved_files);
 }
 
+
+bool
+cc_symbol_def(struct cc_symbol* sp, const char* file_name, unsigned int line, unsigned int col, struct cc_def* out_def) {
+  CXSourceLocation location = clang_getLocation(sp->tu, clang_getFile(sp->tu, file_name), line, col);
+  CXCursor cursor = clang_getCursor(sp->tu, location);
+  CXCursor def_cursor = clang_getCursorDefinition(cursor);
+  if(clang_Cursor_isNull(def_cursor)) {
+    def_cursor = clang_getCursorReferenced(cursor);
+    if(clang_Cursor_isNull(def_cursor)) return false;
+  }
+
+  CXSourceLocation def_location = clang_getCursorLocation(def_cursor);
+  CXFile def_f = NULL;
+  unsigned def_line, def_col, offset;
+
+  clang_getSpellingLocation(def_location, &def_f, &def_line, &def_col, &offset);
+  out_def->filename = clang_getCString(clang_getFileName(def_f));
+  out_def->line = def_line;
+  out_def->col = def_col;
+
+  return  true;
+}

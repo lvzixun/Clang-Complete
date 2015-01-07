@@ -47,6 +47,7 @@ class WraperComplete(object):
       CXCursorKind.VAR_DECL: self._var,
       CXCursorKind.PARM_DECL: self._var,
       CXCursorKind.TYPEDEF_DECL: self._typdef,
+      CXCursorKind.STRUCT_DECL: self._struct,
     }
 
 
@@ -61,6 +62,7 @@ class WraperComplete(object):
     print("unknow kind: ", v.kind, v.name)
     trigger, contents = self._attach(v)
     return (trigger, contents)
+
 
 
   def _attach(self, v, begin_idx=0):
@@ -113,6 +115,11 @@ class WraperComplete(object):
     return self._var(v)
 
 
+  def _struct(self, v):
+    trigger = "%s\t%s" % (v.name, "struct")
+    return (trigger, v.name)
+
+
 class Complete(object):
   symbol_map = {}
   wraper = WraperComplete()
@@ -120,7 +127,7 @@ class Complete(object):
 
   @staticmethod
   def get_symbol(file_name, unsaved_files=[]):
-    self = Complete    
+    self = Complete
     if file_name in self.symbol_map:
       return self.symbol_map[file_name]
     else:
@@ -149,6 +156,21 @@ class Complete(object):
     caret= view.sel()[0].begin()
     line = view.substr(sublime.Region(view.line(caret).a, caret))
     return Complete.member_regex.search(line) != None
+
+
+class ClangGotoDef(sublime_plugin.TextCommand):
+  def run(self, edit):
+    filename = self.view.file_name()
+    pos = self.view.sel()[0].begin()
+    row, col = self.view.rowcol(pos)
+
+    sym = Complete.get_symbol(filename)
+    location = sym.get_def(filename, row+1, col+1)
+    if location.has :
+      print(location.target)
+      self.view.window().open_file(location.target, sublime.ENCODED_POSITION)
+    else:
+      sublime.status_message("Cant find definition")
 
 
 class CCAutoComplete(sublime_plugin.EventListener):
@@ -199,8 +221,7 @@ class CCAutoComplete(sublime_plugin.EventListener):
 
     if self.complete_result != None:
       ret = None
-      if len(self.complete_result) > 0:
-        ret = (self.complete_result, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+      ret = (self.complete_result, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
       self.complete_result = None
       return ret
 
@@ -216,8 +237,9 @@ class CCAutoComplete(sublime_plugin.EventListener):
           entry = Complete.wraper.get_entry(v)
           # print("[%d] %s  %s" % (i, entry[1], v.kind))
           ret.append(entry)
-        self.complete_result = ret
-        self.per_complete()
+        if len(ret) > 0:
+          self.complete_result = ret
+          self.per_complete()
 
       self.t = threading.Thread(target=do_complete)
       self.t.start()
