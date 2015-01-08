@@ -6,11 +6,6 @@ import sublime, sublime_plugin
 from cc.clang_error import *
 from cc.cc import *
 
-opt = [
-  "-Wall",
-  "-I/Users/zixunlv/codes/A2/src",
-  "-I/usr/local/opt/llvm/include",
-]
 
 language_regex = re.compile("(?<=source\.)[\w+#]+")
 drivers = {
@@ -26,13 +21,16 @@ def get_unsaved_files(view):
       buffer = [(view.file_name(), view.substr(sublime.Region(0, view.size())))]
   return buffer
 
-
-def can_complete(view):
+def get_language(view):
   caret = view.sel()[0].a
   language = language_regex.search(view.scope_name(caret))
   if language != None:
     language = language.group(0)
+  return language
 
+
+def can_complete(view):
+  language = get_language(view)
   return language in drivers
 
 
@@ -125,12 +123,26 @@ class Complete(object):
   wraper = WraperComplete()
   member_regex = re.compile(r"(([a-zA-Z_]+[0-9_]*)|([\)\]])+)((\.)|(->))$")
 
+
   @staticmethod
-  def get_symbol(file_name, unsaved_files=[]):
+  def get_symbol(file_name, view, unsaved_files=[]):
     self = Complete
     if file_name in self.symbol_map:
       return self.symbol_map[file_name]
+
     else:
+      settings = sublime.load_settings("cc.sublime-settings")
+      additional_lang_opts = settings.get("additional_language_options", {})
+      language = get_language(view)
+      include_opts = settings.get("include_options", [])
+      opt = []
+      if language in additional_lang_opts:
+      	for v in additional_lang_opts[language]:
+      	  opt.append(v)
+
+      for v in include_opts:
+      	opt.append(v)
+
       sym = CCSymbol(file_name, opt, unsaved_files)
       self.symbol_map[file_name] = sym
       return sym
@@ -164,10 +176,10 @@ class ClangGotoDef(sublime_plugin.TextCommand):
     pos = self.view.sel()[0].begin()
     row, col = self.view.rowcol(pos)
 
-    sym = Complete.get_symbol(filename)
+    sym = Complete.get_symbol(filename, self.view)
     location = sym.get_def(filename, row+1, col+1)
     if location.has :
-      print(location.target)
+      # print(location.target)
       self.view.window().open_file(location.target, sublime.ENCODED_POSITION)
     else:
       sublime.status_message("Cant find definition")
@@ -195,7 +207,7 @@ class CCAutoComplete(sublime_plugin.EventListener):
       return 
 
     file_name = view.file_name()
-    sym = Complete.get_symbol(file_name)
+    sym = Complete.get_symbol(file_name, view)
     sym.reparse()
     digst = sym.diagnostic()
     
@@ -203,6 +215,7 @@ class CCAutoComplete(sublime_plugin.EventListener):
     clang_error_panel.set_data(output)
     clang_error_panel.error_marks(view, digst)
 
+    # print(output)
     window = view.window()
     if not window is None and len(digst) > 1:
       window.run_command("clang_toggle_panel", {"show": True})
@@ -228,7 +241,7 @@ class CCAutoComplete(sublime_plugin.EventListener):
     elif not self.t or not self.t.is_alive():
       unsaved_files = get_unsaved_files(view)
       def do_complete():
-        sym = Complete.get_symbol(file_name, unsaved_files)
+        sym = Complete.get_symbol(file_name, view, unsaved_files)
         results = sym.complete_at(line, col, unsaved_files)
         complete = results.match(prefix)
         ret = []
