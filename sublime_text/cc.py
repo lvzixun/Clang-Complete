@@ -47,7 +47,11 @@ class CXDiagnosticSet(Structure):
       raise StopIteration
     else:
       s = libcc_diagnostic(self, self.it).decode("utf-8")
-      (filename, line, col, error_type) = digst_regex.match(s).groups()
+      ret = digst_regex.match(s)
+      if ret != None:
+      	(filename, line, col, error_type) = ret.groups()
+      else:
+      	(filename, line, col, error_type) = ("", 0, 0, "fatal error")
       self.it += 1
       return self.it - 1, (filename, int(line), int(col), error_type, s)
 

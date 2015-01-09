@@ -13,8 +13,8 @@ class ClangTogglePanel(sublime_plugin.WindowCommand):
 
 class ClangErrorPanelFlush(sublime_plugin.TextCommand):
     def run(self, edit, data):
-	    self.view.erase(edit, sublime.Region(0, self.view.size()))
-	    self.view.insert(edit, 0, data)
+      self.view.erase(edit, sublime.Region(0, self.view.size()))
+      self.view.insert(edit, 0, data)
 
 
 def is_view_visible(view, window=None):
@@ -67,10 +67,11 @@ class ClangErrorPanel(object):
     def error_marks(self, view, digst):
         self.erase_error_marks(view)
 
+        cur_filename = view.file_name()
         outlines = {'warning': [], 'error': [], 'fatal error': []}
         for i, (filename, line, col, error_type, info) in digst:
             print(error_type, line)
-            if error_type in outlines:
+            if error_type in outlines and cur_filename == filename:
                 outlines[error_type].append(view.full_line(view.text_point(line-1, 0)))
 
         for line_type in outlines:

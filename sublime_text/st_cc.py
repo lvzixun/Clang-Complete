@@ -143,6 +143,7 @@ class Complete(object):
       for v in include_opts:
       	opt.append(v)
 
+      # print(opt)
       sym = CCSymbol(file_name, opt, unsaved_files)
       self.symbol_map[file_name] = sym
       return sym
@@ -188,8 +189,10 @@ class ClangGotoDef(sublime_plugin.TextCommand):
 class CCAutoComplete(sublime_plugin.EventListener):
   complete_result = None
   t = False
+  dirty = False
 
   def on_modified(self, view):
+    self.dirty = True
     if can_complete(view) and Complete.is_member_completion(view):
       self.per_complete()
 
@@ -200,7 +203,7 @@ class CCAutoComplete(sublime_plugin.EventListener):
     def hack2():
       sublime.active_window().run_command("auto_complete")
     sublime.set_timeout(hack2, 1)
-  
+
 
   def on_post_save_async(self, view):
     if not can_complete(view):
@@ -208,16 +211,18 @@ class CCAutoComplete(sublime_plugin.EventListener):
 
     file_name = view.file_name()
     sym = Complete.get_symbol(file_name, view)
-    sym.reparse()
+    if self.dirty:
+      sym.reparse()
+    self.dirty = False
     digst = sym.diagnostic()
     
     output = "\n".join([err for _, (_, _, _, _, err) in digst])
     clang_error_panel.set_data(output)
     clang_error_panel.error_marks(view, digst)
 
-    # print(output)
+    print(output)
     window = view.window()
-    if not window is None and len(digst) > 1:
+    if not window is None and len(digst) >= 1:
       window.run_command("clang_toggle_panel", {"show": True})
 
   
