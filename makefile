@@ -2,7 +2,8 @@ CC = clang
 OUT = cc
 CFLAGS = -g -Wall
 
-CLANG = /usr/local/opt/llvm/lib
+CLANG = $(PWD)/sublime_text/lib
+ST3 = ~/Library/Application\ Support/Sublime\ Text\ 3/Packages
 
 FILES = \
 src/cc_result.c \
@@ -15,7 +16,10 @@ src/py_bind.c
 all: cc_lib
 
 cc_lib: $(FILES)
-	$(CC) -shared -o libcc.so $(CFLAGS) -Wl,-undefined,dynamic_lookup $^ -L$(CLANG) -rpath $(CLANG)  -lclang
+	$(CC) -shared -o libcc.so $(CFLAGS) $^ -L$(CLANG) -rpath $(CLANG) -I$(CLANG)/include  -lclang
+
+install:
+	ln -s $(PWD)/sublime_text $(ST3)/cc
 
 cc: cc_lib
 	clang -o cc test/test_cc.c libcc.so
@@ -29,6 +33,7 @@ tcc: clang_complete.c
 
 .PHONY : clean
 clean:
+	rm $(ST3)/cc
 	rm tcc
 	rm cc
 	rm tt
