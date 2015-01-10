@@ -10,4 +10,4 @@ $ make
 $ make install
 ```
 ## preview
-<img src="http://rainbowcoder.com/pic/cc.gif" width="50%" />
+<img src="http://ww4.sinaimg.cn/large/7608d17fgw1eo4dgrggc0g20da0bi44p.gif" width="50%" />
