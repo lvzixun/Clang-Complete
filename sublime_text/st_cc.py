@@ -199,7 +199,6 @@ class CCAutoComplete(sublime_plugin.EventListener):
 
   def per_complete(self):
     sublime.active_window().run_command("hide_auto_complete")
-    self.is_trigger = True
     def hack2():
       sublime.active_window().run_command("auto_complete")
     sublime.set_timeout(hack2, 1)
@@ -261,7 +260,10 @@ class CCAutoComplete(sublime_plugin.EventListener):
 
       self.t = threading.Thread(target=do_complete)
       self.t.start()
-      return None
+      if prefix == "":
+        return ([], sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+      else:  
+        return None
 
     else:
       print("complete busy!")
