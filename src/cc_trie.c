@@ -32,7 +32,7 @@ static int idx2char[] = {
 };
 
 
-#define c2idx(c) (assert(((int)c)>=0 && ((int)c)<=0xff), _char2pos[(int)c]-1)
+#define c2idx(c) (assert(((unsigned char)c)>=0 && ((unsigned char)c)<=0xff), _char2pos[(unsigned char)c]-1)
 #define pos2node(tp, node_pos) ( (assert(node_pos>0 && tp->pool.pos>=(node_pos)), &(tp->pool.p[(node_pos)-1])) )
 
 struct cc_node {
