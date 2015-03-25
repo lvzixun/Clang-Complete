@@ -16,7 +16,7 @@ src/py_bind.c
 all: cc_lib
 
 cc_lib: $(FILES)
-	$(CC) -shared -o libcc.so $(CFLAGS) $^ -L$(CLANG) -rpath $(CLANG) -I$(CLANG)/include  -lclang
+	$(CC) -shared -o sublime_text/lib/libcc.so $(CFLAGS) $^ -L$(CLANG) -rpath $(CLANG) -I$(CLANG)/include  -lclang
 
 install:
 	ln -s $(PWD)/sublime_text $(ST3)/cc
@@ -34,8 +34,9 @@ tcc: clang_complete.c
 .PHONY : clean
 clean:
 	rm $(ST3)/cc
-	rm tcc
-	rm cc
-	rm tt
-	rm -rf src/*.o
-	rm *.so
+	rm  -f cc
+	rm  -f tt
+	rm  -rf src/*.o
+	rm  -rf *.so
+	rm  -rf sublime_text/lib/*.so
+	rm  -f tcc

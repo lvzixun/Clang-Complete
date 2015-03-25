@@ -5,7 +5,7 @@ import re
 
 
 current_path = os.path.dirname(os.path.abspath(__file__))
-libcc = cdll.LoadLibrary('%s/../libcc.so' % current_path)
+libcc = cdll.LoadLibrary('%s/lib/libcc.so' % current_path)
 
 class _cc_symbol(Structure):
   pass
