@@ -200,7 +200,11 @@ class CCAutoComplete(sublime_plugin.EventListener):
   def per_complete(self):
     sublime.active_window().run_command("hide_auto_complete")
     def hack2():
-      sublime.active_window().run_command("auto_complete")
+      sublime.active_window().run_command("auto_complete",{
+        'disable_auto_insert': True,
+        'api_completions_only': True,
+        'next_competion_if_showing': False
+      })
     sublime.set_timeout(hack2, 1)
 
 
@@ -236,9 +240,10 @@ class CCAutoComplete(sublime_plugin.EventListener):
     if not can_complete(view):
       return
 
+    flag = sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS
     if self.complete_result != None:
       ret = None
-      ret = (self.complete_result, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+      ret = (self.complete_result, flag)
       self.complete_result = None
       return ret
 
@@ -261,7 +266,7 @@ class CCAutoComplete(sublime_plugin.EventListener):
       self.t = threading.Thread(target=do_complete)
       self.t.start()
       if prefix == "":
-        return ([], sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+        return ([], flag)
       else:  
         return None
 
