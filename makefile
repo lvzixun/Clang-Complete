@@ -2,7 +2,7 @@ CC = clang
 OUT = cc
 CFLAGS = -g -Wall
 
-CLANG = $(PWD)/sublime_text/lib
+CLANG = $(PWD)/lib
 ST3 = ~/Library/Application\ Support/Sublime\ Text\ 3/Packages
 
 FILES = \
@@ -16,10 +16,10 @@ src/py_bind.c
 all: cc_lib
 
 cc_lib: $(FILES)
-	$(CC) -shared -o sublime_text/lib/libcc.so $(CFLAGS) $^ -L$(CLANG) -rpath $(CLANG) -I$(CLANG)/include  -lclang
+	$(CC) -shared -o lib/libcc.so $(CFLAGS) $^ -L$(CLANG) -rpath $(CLANG) -I$(CLANG)/include  -lclang
 
 install:
-	ln -s $(PWD)/sublime_text $(ST3)/cc
+	ln -s $(PWD) $(ST3)/cc
 
 cc: cc_lib
 	clang -o cc test/test_cc.c libcc.so
@@ -38,5 +38,5 @@ clean:
 	rm  -f tt
 	rm  -rf src/*.o
 	rm  -rf *.so
-	rm  -rf sublime_text/lib/*.so
+	rm  -rf lib/*.so
 	rm  -f tcc
