@@ -36,7 +36,7 @@
         "-F/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/System/Library/Frameworks/",
         // "-isystem", "/usr/include",
         // "-isystem", "/usr/include/c++/*",
-        "-isystem", "/usr/local/opt/llvm/include"
-        // "-Wall"
+        "-isystem", "/usr/local/opt/llvm/include",
+        "-Wall"
     ],
 }
