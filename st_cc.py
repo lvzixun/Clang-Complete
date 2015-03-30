@@ -134,7 +134,9 @@ class Complete(object):
       settings = sublime.load_settings("cc.sublime-settings")
       additional_lang_opts = settings.get("additional_language_options", {})
       language = get_language(view)
-      include_opts = settings.get("include_options", [])
+      s = view.settings()
+      include_opts = s.has("cc_include_options") and s.get("cc_include_options", []) or settings.get("include_options", [])
+      
       opt = []
       if language in additional_lang_opts:
       	for v in additional_lang_opts[language]:
@@ -240,7 +242,8 @@ class CCAutoComplete(sublime_plugin.EventListener):
     if not can_complete(view):
       return
 
-    flag = sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS
+    #flag = sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS
+    flag = 0
     if self.complete_result != None:
       ret = None
       ret = (self.complete_result, flag)

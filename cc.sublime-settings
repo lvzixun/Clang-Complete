@@ -9,6 +9,25 @@
         "objc++": []
     },
 
+    // add include options to clang
+    // this can also be specified as project specific options.
+    // add somthing lik th following to the `sttings` section:
+    // 
+    // 
+    //     
+    // "settings":
+    // {
+    //     "cc_include_options":
+    //     [
+    //         "-I/headfile_path1",
+    //         "-I/headfile_path2",
+    //         "-I/headfile_path3",
+    //         ...
+    //     ]
+    //     ...
+    // }
+    // if "cc_include_options" exists in your project settings, it'll override rather than add
+    // to the "include_options" defined in cc.sublime-settings.
    "include_options":
    [
         "-isystem", "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/6.0/include",
@@ -17,7 +36,7 @@
         "-F/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/System/Library/Frameworks/",
         // "-isystem", "/usr/include",
         // "-isystem", "/usr/include/c++/*",
-        "-isystem", "/usr/local/opt/llvm/include",
-        "-Wall"
+        "-isystem", "/usr/local/opt/llvm/include"
+        // "-Wall"
     ],
 }
