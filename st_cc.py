@@ -39,12 +39,20 @@ class WraperComplete(object):
   def __init__(self):
     self._dispatch_map = {
       CXCursorKind.FIELD_DECL: self._field,
+
+      CXCursorKind.FUNCTION_TEMPLATE: self._function,
+      CXCursorKind.CXX_METHOD: self._function,
       CXCursorKind.FUNCTION_DECL: self._function,
+      CXCursorKind.DESTRUCTOR: self._function,
+
       CXCursorKind.MACRO_DEFINITION: self._macro,
       CXCursorKind.NOT_IMPLEMENTED: self._not_implemented,
       CXCursorKind.VAR_DECL: self._var,
       CXCursorKind.PARM_DECL: self._var,
       CXCursorKind.TYPEDEF_DECL: self._typdef,
+
+
+      CXCursorKind.CLASS_DECL: self._struct,
       CXCursorKind.STRUCT_DECL: self._struct,
     }
 
@@ -70,9 +78,12 @@ class WraperComplete(object):
     for i in range(begin_idx, v.length):
       trunk = v[i]
       value = trunk.value
-      if trunk.kind == CXCompletionChunkKind.Placeholder:
+      kind = trunk.kind
+      if kind == CXCompletionChunkKind.Placeholder:
         value = "${%d:%s}" % (holder_idx, value)
         holder_idx += 1
+      elif kind == CXCompletionChunkKind.Informative:
+        value = ""
       contents += value
       decl += trunk.value
     return decl, contents
@@ -175,6 +186,9 @@ class Complete(object):
 
 class ClangGotoDef(sublime_plugin.TextCommand):
   def run(self, edit):
+    if not can_complete(self.view):
+      return
+
     filename = self.view.file_name()
     pos = self.view.sel()[0].begin()
     row, col = self.view.rowcol(pos)
@@ -239,7 +253,7 @@ class CCAutoComplete(sublime_plugin.EventListener):
 
     file_name = view.file_name()
 
-    if not can_complete(view) or filename==None:
+    if not can_complete(view) or file_name==None:
       return
 
     #flag = sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS
