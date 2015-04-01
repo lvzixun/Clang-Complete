@@ -3,8 +3,8 @@ import re
 import os
 import sublime, sublime_plugin
 
-from cc.clang_error import *
-from cc.cc import *
+from .clang_error import *
+from .cc import *
 
 
 language_regex = re.compile("(?<=source\.)[\w+#]+")

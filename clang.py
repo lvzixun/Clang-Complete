@@ -1,7 +1,7 @@
 # the type from clang-c/Index.h
 
 from ctypes import cdll, Structure, POINTER, c_char_p, c_void_p, c_uint, c_bool, c_ulong, c_int
-from cc.enum import Enum
+from .enum import Enum
 
 class CXUnsavedFile(Structure):
   _fields_ = [("name", c_char_p), ("contents", c_char_p), ('length', c_ulong)]

@@ -1,5 +1,5 @@
 from ctypes import cdll, Structure, POINTER, c_char_p, c_void_p, c_uint, c_bool, c_ulong, c_int
-from cc.clang import CXUnsavedFile, CXCompletionChunkKind, CXCursorKind
+from .clang import CXUnsavedFile, CXCompletionChunkKind, CXCursorKind
 import os
 import re
 

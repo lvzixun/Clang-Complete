@@ -19,7 +19,7 @@ cc_lib: $(FILES)
 	$(CC) -shared -o lib/libcc.so $(CFLAGS) $^ -L$(CLANG) -rpath $(CLANG) -I$(CLANG)/include  -lclang
 
 install:
-	ln -s $(PWD) $(ST3)/cc
+	ln -s $(PWD) $(ST3)/Clang-Complete
 
 cc: cc_lib
 	clang -o cc test/test_cc.c libcc.so
