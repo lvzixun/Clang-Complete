@@ -33,7 +33,7 @@ tcc: clang_complete.c
 
 .PHONY : clean
 clean:
-	rm $(ST3)/cc
+	rm $(ST3)/Clang-Complete
 	rm  -f cc
 	rm  -f tt
 	rm  -rf src/*.o
