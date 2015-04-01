@@ -239,11 +239,12 @@ class CCAutoComplete(sublime_plugin.EventListener):
 
     file_name = view.file_name()
 
-    if not can_complete(view):
+    if not can_complete(view) or filename==None:
       return
 
     #flag = sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS
     flag = 0
+    aa = 123
     if self.complete_result != None:
       ret = None
       ret = (self.complete_result, flag)
