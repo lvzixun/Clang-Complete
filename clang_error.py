@@ -55,7 +55,7 @@ class ClangErrorPanel(object):
         if not self.is_visible(window):
             self.view = window.get_output_panel("cc")
             self.view.settings().set("result_file_regex", "^(..[^:\n]*):([0-9]+):?([0-9]+)?:? (.*)$")
-            self.view.set_syntax_file('Packages/cc/ErrorPanel.tmLanguage')
+            self.view.set_syntax_file('Packages/Clang-Complete/ErrorPanel.tmLanguage')
         self.flush()
 
         window.run_command("show_panel", {"panel": "output.cc"})
