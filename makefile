@@ -1,9 +1,22 @@
-CC = clang 
-OUT = cc
-CFLAGS = -g -Wall
+UNAME_S := $(shell uname -s)
 
 CLANG = $(PWD)/lib
-ST3 = ~/Library/Application\ Support/Sublime\ Text\ 3/Packages
+
+# mac os x
+ifeq ($(UNAME_S), Darwin)
+	CC = clang
+	CFLAGS = -g -Wall
+	LIB_FLAG = -rpath $(CLANG)
+	ST3 = ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/Clang-Complete
+endif
+
+# linux
+ifeq ($(UNAME_S), Linux)
+	CC = gcc
+	CFLAGS = -g -Wall
+	ST3 = ~/.config/sublime-text-3/Packages/Clang-Complete
+endif
+
 
 FILES = \
 src/cc_result.c \
@@ -16,10 +29,10 @@ src/py_bind.c
 all: cc_lib
 
 cc_lib: $(FILES)
-	$(CC) -shared -o lib/libcc.so $(CFLAGS) $^ -L$(CLANG) -rpath $(CLANG) -I$(CLANG)/include  -lclang
+	$(CC) -shared -o lib/libcc.so $(CFLAGS) $^ -L$(CLANG) $(LIB_FLAG) -I$(CLANG)/include  -lclang
 
 install:
-	ln -s $(PWD) $(ST3)/Clang-Complete
+	ln -s $(PWD) $(ST3)
 
 cc: cc_lib
 	clang -o cc test/test_cc.c libcc.so
@@ -33,7 +46,7 @@ tcc: clang_complete.c
 
 .PHONY : clean
 clean:
-	rm $(ST3)/Clang-Complete
+	rm $(ST3)
 	rm  -f cc
 	rm  -f tt
 	rm  -rf src/*.o
