@@ -22,10 +22,10 @@ $ make install
 ## setting config
 set global options in `<sublime text3>/Packages/cc.sublime-ettings` file. you can add custom headfile at `include_options` section. 
 this can also be specified as project specific options.
-add somthing like the following to the `sttings` section in your `<name>.sublime-project` file:
+add somthing like the following to the `settings` section in your `<name>.sublime-project` file:
 
 
-~~~~.json
+~~~~.js
 "settings":
 {
     "cc_include_options":
@@ -33,9 +33,9 @@ add somthing like the following to the `sttings` section in your `<name>.sublime
         "-I/headfile_path1",
         "-I/headfile_path2",
         "-I/headfile_path3"
-        ...
+        // ...
     ]
-    ...
+     // ...
 }
 ~~~~
 if `"cc_include_options"` exists in your project settings, it'll override rather than add
