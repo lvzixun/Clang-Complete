@@ -8,13 +8,15 @@ ifeq ($(UNAME_S), Darwin)
 	CFLAGS = -g -Wall
 	LIB_FLAG = -rpath $(CLANG)
 	ST3 = ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/Clang-Complete
+	LIBCC = lib/libcc.so
 endif
 
 # linux
 ifeq ($(UNAME_S), Linux)
 	CC = gcc
-	CFLAGS = -g -Wall
+	CFLAGS = -g -Wall -fPIC
 	ST3 = ~/.config/sublime-text-3/Packages/Clang-Complete
+	LIBCC = lib/libcc.so
 endif
 
 
@@ -28,28 +30,33 @@ src/py_bind.c
 
 all: cc_lib
 
+
+linux: linux_config cc_lib
+
+linux_config:
+	sudo apt-get install clang
+	sudo ln -sf /usr/lib/llvm-3.5/lib/libclang-3.5.so.1 ./lib/libclang.so
+
 cc_lib: $(FILES)
-	$(CC) -shared -o lib/libcc.so $(CFLAGS) $^ -L$(CLANG) $(LIB_FLAG) -I$(CLANG)/include  -lclang
+	$(CC) -shared -o $(LIBCC)  $(CFLAGS) $^ -L$(CLANG) $(LIB_FLAG) -I$(CLANG)/include  -lclang
 
 install:
 	ln -s $(PWD) $(ST3)
 
+##  for test
 cc: cc_lib
-	clang -o cc test/test_cc.c libcc.so
+	$(CC) -o cc test/test_cc.c -I$(CLANG)/include  $(LIBCC)
 
 trie: src/cc_trie.c test/test_trie.c test/token.h
 	$(CC) -o trie $(CFLAGS) src/cc_trie.c test/test_trie.c
 
-tcc: clang_complete.c
-	$(CC) -o $@ $(CFLAGS) $^ -L$(CLANG) -rpath $(CLANG) -lclang
 
 
 .PHONY : clean
 clean:
-	rm $(ST3)
+	rm  -f $(ST3)
 	rm  -f cc
 	rm  -f tt
 	rm  -rf src/*.o
-	rm  -rf *.so
-	rm  -rf lib/*.so
+	rm  -rf $(LIBCC)
 	rm  -f tcc
