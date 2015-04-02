@@ -1,7 +1,7 @@
 clang-complete
 =============
 
-A clang plugin for sublime text3(MAC OSX), providing auto complete, syntax diagnostic and goto definition, using libclang(llvm 3.5.0). 
+A clang plugin for sublime text3(MAC OSX / linux), providing auto complete, syntax diagnostic and goto definition, using libclang(llvm 3.5.0). 
 
 
 ## install plugin
@@ -10,14 +10,20 @@ A clang plugin for sublime text3(MAC OSX), providing auto complete, syntax diagn
 
 ```
 $ git clone https://github.com/lvzixun/clang-complete.git
-$ make
+$ cd clang-complete
+$ make [linux]
 $ make install
 ```
+`make linux` for ubuntu,  default `make` for mac osx.
 
+ 
 #### from package control
 1. install [package control](https://packagecontrol.io/installation)
 2. `command+shift + p` -> `install package`
 3. search `Clang-Complete` -> install
+
+download plugin from package control only support mac.
+
 
 ## setting config
 set global options in `<sublime text3>/Packages/cc.sublime-ettings` file. you can add custom headfile at `include_options` section. 
@@ -46,6 +52,9 @@ to the `"include_options"` defined in `cc.sublime-settings`.
 <img src="http://ww4.sinaimg.cn/large/7608d17fgw1eo4dgrggc0g20da0bi44p.gif" width="50%" />
 
 ## TODO LIST
-1. support sublimetext 2
-2. support window
-3. support linux
+| feature | status |
+|:--------:|:-------:|
+| support mac osx | done |
+| support linux  | done |
+| support window | X |
+| support sublimetext 2 | X |
