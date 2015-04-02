@@ -6,7 +6,7 @@ A clang plugin for sublime text3(MAC OSX), providing auto complete, syntax diagn
 
 ## install plugin
 
-#### install plugin from git respositiory
+#### from git respositiory
 
 ```
 $ git clone https://github.com/lvzixun/clang-complete.git
@@ -14,7 +14,7 @@ $ make
 $ make install
 ```
 
-#### install plugin from package control
+#### from package control
 1. install [package control](https://packagecontrol.io/installation)
 2. `command+shift + p` -> `install package`
 3. search `Clang-Complete` -> install
@@ -44,3 +44,8 @@ to the `"include_options"` defined in `cc.sublime-settings`.
 
 ## preview
 <img src="http://ww4.sinaimg.cn/large/7608d17fgw1eo4dgrggc0g20da0bi44p.gif" width="50%" />
+
+## TODO LIST
+1. support sublimetext 2
+2. support window
+3. support linux
