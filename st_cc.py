@@ -48,6 +48,9 @@ class WraperComplete(object):
       CXCursorKind.MACRO_DEFINITION: self._macro,
       CXCursorKind.NOT_IMPLEMENTED: self._not_implemented,
       CXCursorKind.VAR_DECL: self._var,
+      CXCursorKind.ENUM_CONSTANT_DECL: self._var,
+
+
       CXCursorKind.PARM_DECL: self._var,
       CXCursorKind.TYPEDEF_DECL: self._typdef,
 
