@@ -6,7 +6,7 @@ CLANG = $(PWD)/lib
 ifeq ($(UNAME_S), Darwin)
 	CC = clang
 	CFLAGS = -g -Wall
-	LIB_FLAG = -rpath $(CLANG)
+	LIB_FLAG = -Wl,-rpath,@loader_path/.
 	ST3 = ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/Clang-Complete
 	LIBCC = lib/libcc.so
 endif
