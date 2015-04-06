@@ -6,7 +6,7 @@ A clang plugin for sublime text3(MAC OSX / linux), providing auto complete, synt
 
 ## install plugin
 
-#### from git respositiory
+#### from git repository
 
 ```
 $ git clone https://github.com/lvzixun/clang-complete.git
