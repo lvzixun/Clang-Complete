@@ -9,6 +9,9 @@
         "objc++": []
     },
 
+    // open or close inhibit the sublime text 3 built in word completions
+    "inhibit": true,
+
     // add include options to clang
     // this can also be specified as project specific options.
     // add somthing like the following to the `sttings` section in your `<name>.sublime-project` file:

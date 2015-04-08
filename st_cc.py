@@ -137,6 +137,31 @@ class Complete(object):
   wraper = WraperComplete()
   member_regex = re.compile(r"(([a-zA-Z_]+[0-9_]*)|([\)\]])+)((\.)|(->))$")
 
+  @staticmethod
+  def get_settings():
+    return sublime.load_settings("cc.sublime-settings")
+
+  @staticmethod
+  def get_opt(view):
+    settings = Complete.get_settings()
+    additional_lang_opts = settings.get("additional_language_options", {})
+    language = get_language(view)
+    s = view.settings()
+    include_opts = s.has("cc_include_options") and s.get("cc_include_options", []) or settings.get("include_options", [])
+    
+    opt = []
+    if language in additional_lang_opts:
+      for v in additional_lang_opts[language]:
+        opt.append(v)
+
+    for v in include_opts:
+      opt.append(v)
+    return opt
+
+  @staticmethod
+  def is_inhibit():
+    settings = Complete.get_settings()
+    return settings.has("inhibit") and settings.get("inhibit") or False
 
   @staticmethod
   def get_symbol(file_name, view, unsaved_files=[]):
@@ -145,20 +170,7 @@ class Complete(object):
       return self.symbol_map[file_name]
 
     else:
-      settings = sublime.load_settings("cc.sublime-settings")
-      additional_lang_opts = settings.get("additional_language_options", {})
-      language = get_language(view)
-      s = view.settings()
-      include_opts = s.has("cc_include_options") and s.get("cc_include_options", []) or settings.get("include_options", [])
-      
-      opt = []
-      if language in additional_lang_opts:
-      	for v in additional_lang_opts[language]:
-      	  opt.append(v)
-
-      for v in include_opts:
-      	opt.append(v)
-
+      opt = self.get_opt(view)
       # print(opt)
       sym = CCSymbol(file_name, opt, unsaved_files)
       self.symbol_map[file_name] = sym
@@ -221,7 +233,7 @@ class CCAutoComplete(sublime_plugin.EventListener):
     def hack2():
       sublime.active_window().run_command("auto_complete",{
         'disable_auto_insert': True,
-        'api_completions_only': True,
+        'api_completions_only': Complete.is_inhibit(),
         'next_competion_if_showing': False
       })
     sublime.set_timeout(hack2, 1)
@@ -259,7 +271,7 @@ class CCAutoComplete(sublime_plugin.EventListener):
     if not can_complete(view) or file_name==None:
       return
 
-    #flag = sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS
+    # flag = sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS
     flag = 0
     aa = 123
     if self.complete_result != None:
