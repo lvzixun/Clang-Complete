@@ -1,6 +1,6 @@
 UNAME_S := $(shell uname -s)
 
-CLANG = $(PWD)/lib
+CLANG = "$(PWD)/lib"
 
 # mac os x
 ifeq ($(UNAME_S), Darwin)
@@ -40,7 +40,7 @@ linux_config:
 cc_lib: $(FILES)
 	$(CC) -shared -o $(LIBCC)  $(CFLAGS) $^ -L$(CLANG) $(LIB_FLAG) -I$(CLANG)/include  -lclang
 
-install:
+link:
 	ln -s $(PWD) $(ST3)
 
 ##  for test

@@ -16,10 +16,9 @@ Note: To determine the path to Sublime Text 3 Packages directory, start Sublime 
 
 ```
 $ cd <sublime-text-3 Packages directory>  # see note above
-$ git clone https://github.com/lvzixun/clang-complete.git
-$ cd clang-complete
+$ git clone https://github.com/lvzixun/Clang-Complete.git
+$ cd Clang-Complete
 $ make [linux]
-$ make install
 ```
 On Ubuntu, `$ make linux`, On Mac OSX, run the default `$ make`.
 
