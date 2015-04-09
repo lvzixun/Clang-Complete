@@ -1,35 +1,42 @@
-clang-complete
+Clang-Complete
 =============
 
-A clang plugin for sublime text3(MAC OSX / linux), providing auto complete, syntax diagnostic and goto definition, using libclang(llvm 3.5.0). 
+A clang plugin for Sublime Text 3 (MAC OSX / Linux), providing:
+- Auto complete
+- Syntax diagnostic
+- Goto definition
 
+Using libclang (llvm 3.5.0). 
 
-## install plugin
+## Install the Plugin
 
-#### from git repository
+#### From git repository
+
+Note: To determine the path to Sublime Text 3 Packages directory, start Sublime Text 3, Choose menu `Preferences` -> `Browse Packages` 
 
 ```
+$ cd <sublime-text-3 Packages directory>  # see note above
 $ git clone https://github.com/lvzixun/clang-complete.git
 $ cd clang-complete
 $ make [linux]
 $ make install
 ```
-`make linux` for ubuntu,  default `make` for mac osx.
+On Ubuntu, `$ make linux`, On Mac OSX, run the default `$ make`.
 
  
-#### from package control
-1. install [package control](https://packagecontrol.io/installation)
+#### From package control
+1. Install [package control](https://packagecontrol.io/installation)
 2. `command+shift + p` -> `install package`
-3. search `Clang-Complete` -> install
+3. Search `Clang-Complete` -> install
 
-download plugin from package control only support mac.
+Installation using Package Control is only support on Mac.
 
 
-## setting config
-set global options in `<sublime text3>/Packages/cc.sublime-ettings` file. you can add custom headfile at `include_options` section. 
-this can also be specified as project specific options.
-add somthing like the following to the `settings` section in your `<name>.sublime-project` file:
+## Configuration
 
+Global options can be set in `<sublime-text-3 Packages directory>/clang-complete/cc.sublime-settings` file. Header files can be included in the `include_options` section.
+
+Alternatively, header files can also be included from the Sublime Text 3 `<name>.sublime-project` files by adding the `cc_include_options` subsection to the `settings` section in your `<name>.sublime-project` file:
 
 ~~~~.js
 "settings":
@@ -44,14 +51,15 @@ add somthing like the following to the `settings` section in your `<name>.sublim
      // ...
 }
 ~~~~
-if `"cc_include_options"` exists in your project settings, it'll override rather than add
+
+if `"cc_include_options"` exists in your project settings, it will override rather than add
 to the `"include_options"` defined in `cc.sublime-settings`.
 
 
-## preview
+## Preview
 <img src="http://ww4.sinaimg.cn/large/7608d17fgw1eo4dgrggc0g20da0bi44p.gif" width="50%" />
 
-## support
+## Support
 [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9SSZZ9NYW9F6E)
 
 
