@@ -58,8 +58,9 @@ to the `"include_options"` defined in `cc.sublime-settings`.
 ## Preview
 <img src="http://ww4.sinaimg.cn/large/7608d17fgw1eo4dgrggc0g20da0bi44p.gif" width="50%" />
 
-## Support
-[Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9SSZZ9NYW9F6E)
+## Donate
+[Paypal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9SSZZ9NYW9F6E)
+alipay支付宝账号: lvzixun@gmail.com 
 
 
 
