@@ -60,6 +60,7 @@ to the `"include_options"` defined in `cc.sublime-settings`.
 
 ## Donate
 [Paypal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9SSZZ9NYW9F6E)
+
 alipay支付宝账号: lvzixun@gmail.com 
 
 
