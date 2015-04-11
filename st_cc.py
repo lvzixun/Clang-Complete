@@ -57,6 +57,7 @@ class WraperComplete(object):
 
       CXCursorKind.CLASS_DECL: self._struct,
       CXCursorKind.STRUCT_DECL: self._struct,
+      CXCursorKind.CONSTRUCTOR: self._struct,
     }
 
 
@@ -160,7 +161,7 @@ class Complete(object):
 
     for v in include_opts:
       opt.append(v)
-    print("opt: ", opt)
+    print("clang options: ", opt)
     return opt
 
   @staticmethod
@@ -176,7 +177,6 @@ class Complete(object):
 
     else:
       opt = self.get_opt(view)
-      # print(opt)
       sym = CCSymbol(file_name, opt, unsaved_files)
       self.symbol_map[file_name] = sym
       return sym
