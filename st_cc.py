@@ -138,6 +138,10 @@ class Complete(object):
   member_regex = re.compile(r"(([a-zA-Z_]+[0-9_]*)|([\)\]])+)((\.)|(->))$")
 
   @staticmethod
+  def clean():
+    Complete.symbol_map = {}
+
+  @staticmethod
   def get_settings():
     return sublime.load_settings("cc.sublime-settings")
 
@@ -156,6 +160,7 @@ class Complete(object):
 
     for v in include_opts:
       opt.append(v)
+    print("opt: ", opt)
     return opt
 
   @staticmethod
@@ -197,6 +202,14 @@ class Complete(object):
     caret= view.sel()[0].begin()
     line = view.substr(sublime.Region(view.line(caret).a, caret))
     return Complete.member_regex.search(line) != None
+
+
+class ClangClean(sublime_plugin.TextCommand):
+  def run(self, edit):
+    if not can_complete(self.view):
+      return
+
+    Complete.clean()
 
 
 class ClangGotoDef(sublime_plugin.TextCommand):
