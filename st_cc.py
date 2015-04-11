@@ -9,10 +9,10 @@ from .cc import *
 
 language_regex = re.compile("(?<=source\.)[\w+#]+")
 drivers = {
-  "c++": True,
-  "c": True,
-  "objc": True,
-  "objc++": True,
+  "c++": "-xc++",
+  "c": "-xc",
+  "objc": "-ObjC",
+  "objc++": "-ObjC++",
 }
 
 def get_unsaved_files(view):
@@ -153,7 +153,7 @@ class Complete(object):
     s = view.settings()
     include_opts = s.has("cc_include_options") and s.get("cc_include_options", []) or settings.get("include_options", [])
     
-    opt = []
+    opt = [drivers[language]]
     if language in additional_lang_opts:
       for v in additional_lang_opts[language]:
         opt.append(v)
