@@ -45,6 +45,7 @@ class WraperComplete(object):
       CXCursorKind.FUNCTION_DECL: self._function,
       CXCursorKind.DESTRUCTOR: self._function,
 
+      CXCursorKind.NAMESPACE: self._namespace,
       CXCursorKind.MACRO_DEFINITION: self._macro,
       CXCursorKind.NOT_IMPLEMENTED: self._not_implemented,
       CXCursorKind.VAR_DECL: self._var,
@@ -54,10 +55,11 @@ class WraperComplete(object):
       CXCursorKind.PARM_DECL: self._var,
       CXCursorKind.TYPEDEF_DECL: self._typdef,
 
-
-      CXCursorKind.CLASS_DECL: self._struct,
+      CXCursorKind.CONSTRUCTOR: lambda v:self._struct(v, "constructor"),
+      CXCursorKind.UNION_DECL: lambda v:self._struct(v, "union"),
+      CXCursorKind.CLASS_TEMPLATE: lambda v:self._struct(v, "classTemplate"),
+      CXCursorKind.CLASS_DECL: lambda v:self._struct(v, "class"),
       CXCursorKind.STRUCT_DECL: self._struct,
-      CXCursorKind.CONSTRUCTOR: self._struct,
     }
 
 
@@ -111,6 +113,10 @@ class WraperComplete(object):
     trigger = "%s\t%s" % (_v, "KeyWord")
     return (trigger, contents)
 
+  def _namespace(self, v):
+    macro, contents = self._attach(v)
+    trigger = "%s\t%s" % (macro, "namespace")
+    return (trigger, contents)
 
   def _macro(self, v):
     macro, contents = self._attach(v)
@@ -128,15 +134,15 @@ class WraperComplete(object):
     return self._var(v)
 
 
-  def _struct(self, v):
-    trigger = "%s\t%s" % (v.name, "struct")
+  def _struct(self, v, t="struct"):
+    trigger = "%s\t%s" % (v.name, t)
     return (trigger, v.name)
 
 
 class Complete(object):
   symbol_map = {}
   wraper = WraperComplete()
-  member_regex = re.compile(r"(([a-zA-Z_]+[0-9_]*)|([\)\]])+)((\.)|(->))$")
+  member_regex = re.compile(r"(([a-zA-Z_]+[0-9_]*)|([\)\]])+)((\.)|(->)|(::))$")
 
   @staticmethod
   def clean():
@@ -196,7 +202,7 @@ class Complete(object):
 
     cur_char = view.substr(point)
     # print "cur_char:", cur_char
-    if cur_char and cur_char != "." and cur_char != ">" and cur_char != "]":
+    if cur_char and cur_char != "." and cur_char != ">" and cur_char != ":" and cur_char != "[":
       return False
 
     caret= view.sel()[0].begin()
