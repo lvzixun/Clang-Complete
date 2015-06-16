@@ -262,6 +262,9 @@ class CCAutoComplete(sublime_plugin.EventListener):
     if not can_complete(view):
       return 
 
+    settings = Complete.get_settings()
+    hide_error_panel = settings.get('hide_error_panel') or False
+    hide_error_mark = settings.get('hide_error_mark') or False
     file_name = view.file_name()
     sym = Complete.get_symbol(file_name, view)
     if self.dirty:
@@ -271,12 +274,12 @@ class CCAutoComplete(sublime_plugin.EventListener):
     
     output = "\n".join([err for _, (_, _, _, _, err) in digst])
     clang_error_panel.set_data(output)
-    clang_error_panel.error_marks(view, digst)
+    clang_error_panel.error_marks(view, digst, not hide_error_mark)
 
     print(output)
     window = view.window()
     if not window is None and len(digst) >= 1:
-      window.run_command("clang_toggle_panel", {"show": True})
+      window.run_command("clang_toggle_panel", {"show": not hide_error_panel})
 
   
   def on_query_completions(self, view, prefix, locations):

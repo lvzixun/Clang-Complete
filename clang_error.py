@@ -64,7 +64,7 @@ class ClangErrorPanel(object):
         sublime.active_window().run_command("hide_panel", {"panel": "output.cc"})
 
 
-    def error_marks(self, view, digst):
+    def error_marks(self, view, digst, display):
         self.erase_error_marks(view)
 
         cur_filename = view.file_name()
@@ -74,21 +74,23 @@ class ClangErrorPanel(object):
             if error_type in outlines and cur_filename == filename:
                 outlines[error_type].append(view.full_line(view.text_point(line-1, 0)))
 
-        for line_type in outlines:
-            if not outlines[line_type] is None:
-                args = [
-                    'sublimeclang-outlines-{0}'.format(line_type),
-                    outlines[line_type],
-                    self.markers[line_type],
-                    'dot',
-                    sublime.DRAW_OUTLINED
-                ]
-                view.add_regions(*args)
+        if display:
+            for line_type in outlines:
+                if not outlines[line_type] is None:
+                    args = [
+                        'sublimeclang-outlines-{0}'.format(line_type),
+                        outlines[line_type],
+                        self.markers[line_type],
+                        'dot',
+                        sublime.DRAW_OUTLINED
+                    ]
+                    view.add_regions(*args)
 
 
     def erase_error_marks(self, view):
-        view.erase_regions('cc-outlines-error')
-        view.erase_regions('cc-outlines-warning')
+        view.erase_regions('sublimeclang-outlines-error')
+        view.erase_regions('sublimeclang-outlines-warning')
+        view.erase_regions('sublimeclang-outlines-fatal error')
 
 
 clang_error_panel = ClangErrorPanel()
