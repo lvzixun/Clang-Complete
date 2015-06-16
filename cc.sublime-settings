@@ -43,4 +43,10 @@
         "-isystem", "/usr/local/opt/llvm/include",
         "-Wall"
     ],
+
+    // do not show markers for warnings or errors on save.
+    "hide_error_mark": false,
+
+    // do not show the panel for warnings and errors on save.
+    "hide_error_panel": false,
 }
