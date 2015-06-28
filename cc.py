@@ -7,10 +7,10 @@ import re
 
 current_path = os.path.dirname(os.path.abspath(__file__))
 if _platform == "win32":
-os.environ["PATH"] = "%s/lib" % current_path + os.pathsep + os.environ["PATH"]
-    libcc = cdll.LoadLibrary("%s/lib/libcc.dll" % current_path)
+  os.environ["PATH"] = "%s/lib" % current_path + os.pathsep + os.environ["PATH"]
+  libcc = cdll.LoadLibrary("%s/lib/libcc.dll" % current_path)
 else:
-libcc = cdll.LoadLibrary("%s/lib/libcc.so" % current_path)
+  libcc = cdll.LoadLibrary("%s/lib/libcc.so" % current_path)
 
 class _cc_symbol(Structure):
   pass
@@ -27,7 +27,7 @@ class CCTrunk(Structure):
 
   @property
   def kind(self):
-    return CXCompletionChunkKind(self._kind) 
+    return CXCompletionChunkKind(self._kind)
 
 
 digst_regex = re.compile("^(.+?):(\d+):(\d+): (.+?):.*$")
@@ -68,7 +68,7 @@ class CXDiagnosticSet(Structure):
     if key >= self.length:
       raise IndexError
     return libcc_diagnostic(self, key)
-    
+
 
 class CXCompletionResult(Structure):
   _fields_ = [("CursorKind", c_int), ("CompletionString", c_void_p)]
@@ -295,7 +295,7 @@ class CCSymbol(object):
 #   #   for j, trunk in v:
 #   #     print("  trunk: %s kind: %s" % (trunk.value, trunk.kind))
 #   #   print("==========")
-    
+
 #   # diagnostic
 #   # for i, err in symbol.diagnostic():
 #   #   print "[%d] %s" % (i, err)
