@@ -159,7 +159,11 @@ class Complete(object):
     language = get_language(view)
     s = view.settings()
     include_opts = s.has("cc_include_options") and s.get("cc_include_options", []) or settings.get("include_options", [])
-    
+
+    window = sublime.active_window()
+    variables = window.extract_variables()
+    include_opts = sublime.expand_variables(include_opts, variables)
+
     opt = [drivers[language]]
     if language in additional_lang_opts:
       for v in additional_lang_opts[language]:
