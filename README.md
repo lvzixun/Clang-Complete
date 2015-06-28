@@ -24,8 +24,8 @@ On Ubuntu, `$ make linux`, On Mac OSX, run the default `$ make`.
 
 ##### Windows prerequisites
 
-1. install MINGW-W64-32
-2. install CLANG 3.6.1 binary distribution
+1. install MINGW-W64 32 (only if you want to compile yourself - binary is included) e.g. from [here](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/4.8.4/threads-posix/dwarf/i686-4.8.4-release-posix-dwarf-rt_v3-rev0.7z/download)
+2. install [LLVM 3.6.1](http://llvm.org/releases/3.6.1/LLVM-3.6.1-win32.exe)
 
  
 #### From package control
