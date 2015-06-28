@@ -1,11 +1,16 @@
 from ctypes import cdll, Structure, POINTER, c_char_p, c_void_p, c_uint, c_bool, c_ulong, c_int
 from .clang import CXUnsavedFile, CXCompletionChunkKind, CXCursorKind
+from sys import platform as _platform
 import os
 import re
 
 
 current_path = os.path.dirname(os.path.abspath(__file__))
-libcc = cdll.LoadLibrary('%s/lib/libcc.so' % current_path)
+if _platform == "win32":
+os.environ["PATH"] = "%s/lib" % current_path + os.pathsep + os.environ["PATH"]
+    libcc = cdll.LoadLibrary("%s/lib/libcc.dll" % current_path)
+else:
+libcc = cdll.LoadLibrary("%s/lib/libcc.so" % current_path)
 
 class _cc_symbol(Structure):
   pass

@@ -19,6 +19,14 @@ ifeq ($(UNAME_S), Linux)
 	LIBCC = lib/libcc.so
 endif
 
+# windows (mingw)
+ifeq ($(OS),Windows_NT)
+	CLANG = "$(CURDIR)/lib"
+	CC = gcc
+	CFLAGS = -g -Wall
+	LIBCC = lib/libcc.dll
+endif
+
 
 FILES = \
 src/cc_result.c \

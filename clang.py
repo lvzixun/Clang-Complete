@@ -1,6 +1,6 @@
 # the type from clang-c/Index.h
 
-from ctypes import cdll, Structure, POINTER, c_char_p, c_void_p, c_uint, c_bool, c_ulong, c_int
+from ctypes import Structure, POINTER, c_char_p, c_void_p, c_uint, c_bool, c_ulong, c_int
 from .enum import Enum
 
 class CXUnsavedFile(Structure):
