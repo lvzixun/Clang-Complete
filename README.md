@@ -1,7 +1,7 @@
 Clang-Complete
 =============
 
-A clang plugin for Sublime Text 3 (MAC OSX / Linux), providing:
+A clang plugin for Sublime Text 3 (MAC OSX / Linux / Windows), providing:
 - Auto complete
 - Syntax diagnostic
 - Goto definition
@@ -18,9 +18,14 @@ Note: To determine the path to Sublime Text 3 Packages directory, start Sublime 
 $ cd <sublime-text-3 Packages directory>  # see note above
 $ git clone https://github.com/lvzixun/Clang-Complete.git
 $ cd Clang-Complete
-$ make [linux]
+$ make [linux / windows]
 ```
 On Ubuntu, `$ make linux`, On Mac OSX, run the default `$ make`.
+
+##### Windows prerequisites
+
+1. install MINGW-W64 32 (only if you want to compile yourself - binary is included) e.g. from [here](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/4.8.4/threads-posix/dwarf/i686-4.8.4-release-posix-dwarf-rt_v3-rev0.7z/download)
+2. install [LLVM 3.6.1](http://llvm.org/releases/3.6.1/LLVM-3.6.1-win32.exe)
 
  
 #### From package control
@@ -28,7 +33,7 @@ On Ubuntu, `$ make linux`, On Mac OSX, run the default `$ make`.
 2. `command+shift + p` -> `install package`
 3. Search `Clang-Complete` -> install
 
-Installation using Package Control is only support on Mac.
+Installation using Package Control is only supported on Mac.
 
 
 ## Configuration
@@ -50,6 +55,25 @@ Alternatively, header files can also be included from the Sublime Text 3 `<name>
      // ...
 }
 ~~~~
+
+
+Example settings for Windows:
+
+~~~~.js
+    "settings":
+    {
+        "cc_include_options":
+        [
+            "-isystem", "C:\\MinGW\\i686-w64-mingw32\\include",
+            "-isystem", "C:\\MinGW\\i686-w64-mingw32\\include\\c++",
+            "-isystem", "C:\\MinGW\\i686-w64-mingw32\\include\\c++\\tr1",
+            "-isystem", "C:\\MinGW\\i686-w64-mingw32\\include\\c++\\i686-w64-mingw32",
+            "-isystem", "C:\\LLVM\\lib\\clang\\3.6.1\\include",
+            "-DBOOST_USE_WINDOWS_H"
+        ]
+    }
+~~~~
+
 
 if `"cc_include_options"` exists in your project settings, it will override rather than add
 to the `"include_options"` defined in `cc.sublime-settings`.
