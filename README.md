@@ -94,5 +94,5 @@ alipay支付宝账号: lvzixun@gmail.com
 |:--------:|:-------:|
 | support mac osx | done |
 | support linux  | done |
-| support window | X |
+| support window | done |
 | support sublimetext 2 | X |
