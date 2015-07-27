@@ -7,7 +7,13 @@ from .clang_error import *
 from .cc import *
 
 
-language_regex = re.compile("(?<=source\.)[\w+#]+")
+files = {
+  ".c" : "c",
+  ".cpp" : "c++",
+  ".m" : "objc",
+  ".mm" : "objc++",
+}
+
 drivers = {
   "c++": "-xc++",
   "c": "-xc",
@@ -21,16 +27,15 @@ def get_unsaved_files(view):
       buffer = [(view.file_name(), view.substr(sublime.Region(0, view.size())))]
   return buffer
 
-def get_language(view):
-  caret = view.sel()[0].a
-  language = language_regex.search(view.scope_name(caret))
-  if language != None:
-    language = language.group(0)
+def get_language():
+  filename = sublime.active_window().active_view().file_name()
+  filename, file_extension = os.path.splitext(filename)
+  language = files[file_extension]
   return language
 
 
-def can_complete(view):
-  language = get_language(view)
+def can_complete():
+  language = get_language()
   return language in drivers
 
 
@@ -156,7 +161,7 @@ class Complete(object):
   def get_opt(view):
     settings = Complete.get_settings()
     additional_lang_opts = settings.get("additional_language_options", {})
-    language = get_language(view)
+    language = get_language()
     s = view.settings()
     include_opts = s.has("cc_include_options") and s.get("cc_include_options", []) or settings.get("include_options", [])
 
@@ -216,7 +221,7 @@ class Complete(object):
 
 class ClangClean(sublime_plugin.TextCommand):
   def run(self, edit):
-    if not can_complete(self.view):
+    if not can_complete():
       return
 
     Complete.clean()
@@ -224,7 +229,7 @@ class ClangClean(sublime_plugin.TextCommand):
 
 class ClangGotoDef(sublime_plugin.TextCommand):
   def run(self, edit):
-    if not can_complete(self.view):
+    if not can_complete():
       return
 
     filename = self.view.file_name()
@@ -247,7 +252,7 @@ class CCAutoComplete(sublime_plugin.EventListener):
 
   def on_modified(self, view):
     self.dirty = True
-    if can_complete(view) and Complete.is_member_completion(view):
+    if can_complete() and Complete.is_member_completion(view):
       self.per_complete()
 
 
@@ -263,7 +268,7 @@ class CCAutoComplete(sublime_plugin.EventListener):
 
 
   def on_post_save_async(self, view):
-    if not can_complete(view):
+    if not can_complete():
       return 
 
     settings = Complete.get_settings()
@@ -294,7 +299,7 @@ class CCAutoComplete(sublime_plugin.EventListener):
 
     file_name = view.file_name()
 
-    if not can_complete(view) or file_name==None:
+    if not can_complete() or file_name==None:
       return
 
     # flag = sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS
