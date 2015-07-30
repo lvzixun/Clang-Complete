@@ -280,7 +280,8 @@ class CCAutoComplete(sublime_plugin.EventListener):
     clang_error_panel.set_data(output)
     clang_error_panel.error_marks(view, digst, not hide_error_mark)
 
-    print(output)
+    if output:
+      print(output)
     window = view.window()
     if not window is None and len(digst) >= 1:
       window.run_command("clang_toggle_panel", {"show": not hide_error_panel})
