@@ -157,9 +157,11 @@ class Complete(object):
     settings = Complete.get_settings()
     additional_lang_opts = settings.get("additional_language_options", {})
     language = get_language(view)
+    include_opts = settings.get("include_options", [])
     project_data = sublime.active_window().project_data()
-    include_opts = settings.get("include_options", []) + project_data["cc_include_options"]
-    
+    if "cc_include_options" in project_data:
+      include_opts = include_opts + project_data["cc_include_options"]
+
     window = sublime.active_window()
     variables = window.extract_variables()
     include_opts = sublime.expand_variables(include_opts, variables)
