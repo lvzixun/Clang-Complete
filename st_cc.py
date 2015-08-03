@@ -162,8 +162,10 @@ class Complete(object):
     settings = Complete.get_settings()
     additional_lang_opts = settings.get("additional_language_options", {})
     language = get_language()
-    s = view.settings()
-    include_opts = s.has("cc_include_options") and s.get("cc_include_options", []) or settings.get("include_options", [])
+    include_opts = settings.get("include_options", [])
+    project_data = sublime.active_window().project_data()
+    if "cc_include_options" in project_data:
+      include_opts = include_opts + project_data["cc_include_options"]
 
     window = sublime.active_window()
     variables = window.extract_variables()
@@ -285,7 +287,8 @@ class CCAutoComplete(sublime_plugin.EventListener):
     clang_error_panel.set_data(output)
     clang_error_panel.error_marks(view, digst, not hide_error_mark)
 
-    print(output)
+    if output:
+      print(output)
     window = view.window()
     if not window is None and len(digst) >= 1:
       window.run_command("clang_toggle_panel", {"show": not hide_error_panel})
