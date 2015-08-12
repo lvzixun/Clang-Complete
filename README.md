@@ -75,8 +75,8 @@ Example settings for Windows:
 ~~~~
 
 
-if `"cc_include_options"` exists in your project settings, it will override rather than add
-to the `"include_options"` defined in `cc.sublime-settings`.
+if `"cc_include_options"` exists in your project settings, it will merge to
+the `"include_options"` defined in `cc.sublime-settings`.
 
 
 ## Preview
