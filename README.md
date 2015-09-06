@@ -22,10 +22,10 @@ $ make [linux / windows]
 ```
 On Ubuntu, `$ make linux`, On Mac OSX, run the default `$ make`.
 
-##### Windows prerequisites
+##### Windows prerequisites(only if you want to compile yourself)
 
-1. install MINGW-W64 32 (only if you want to compile yourself - binary is included) e.g. from [here](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/4.8.4/threads-posix/dwarf/i686-4.8.4-release-posix-dwarf-rt_v3-rev0.7z/download)
-2. install [LLVM 3.6.1](http://llvm.org/releases/3.6.1/LLVM-3.6.1-win32.exe)
+1. install MINGW-W64 32 e.g. from [here](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/4.8.4/threads-posix/dwarf/i686-4.8.4-release-posix-dwarf-rt_v3-rev0.7z/download)
+2. install [LLVM 3.6.1](http://llvm.org/releases/3.6.1/LLVM-3.6.1-win32.exe)(binary is included in `lib` directory)
 
  
 #### From package control
