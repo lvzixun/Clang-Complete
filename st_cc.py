@@ -84,14 +84,18 @@ class WraperComplete(object):
     for i in range(begin_idx, v.length):
       trunk = v[i]
       value = trunk.value
+      delc_value = value
       kind = trunk.kind
       if kind == CXCompletionChunkKind.Placeholder:
         value = "${%d:%s}" % (holder_idx, value)
         holder_idx += 1
       elif kind == CXCompletionChunkKind.Informative:
         value = ""
+      elif kind== CXCompletionChunkKind.ResultType:
+        value = ""
+        delc_value = ""
       contents += value
-      decl += trunk.value
+      decl += delc_value
     return decl, contents
 
 
