@@ -36,8 +36,12 @@ static int idx2char[] = {
 #define pos2node(tp, node_pos) ( (assert(node_pos>0 && tp->pool.pos>=(node_pos)), &(tp->pool.p[(node_pos)-1])) )
 
 struct cc_node {
-  unsigned int ud;
-  bool has_ud;
+  struct {
+    unsigned int* p;
+    unsigned int tmp;
+    uint32_t pos;
+    uint32_t len;
+  }ud_slot;
 
   uint8_t list[_CHAR_COUNT];
   uint8_t count;
@@ -59,22 +63,70 @@ struct cc_trie {
 
 static uint32_t pool_get(struct cc_trie* tp);
 static uint32_t node_insert(struct cc_trie* tp, uint32_t node_pos, char c);
+
 static struct cc_node* node_next(struct cc_trie* tp, struct cc_node* node, char c);
+static inline void node_init();
 
 struct cc_trie* 
 cc_trie_new() {
+  int i;
   struct cc_trie* tp = (struct cc_trie*)malloc(sizeof(*tp));
   tp->pool.p = (struct cc_node*)malloc(DEF_POOL_SIZE*sizeof(struct cc_node));
   tp->pool.pos = 0;
   tp->pool.size = DEF_POOL_SIZE;
+  for(i=0; i<DEF_POOL_SIZE; i++) {
+    struct cc_node* node = tp->pool.p + i;
+    node_init(node);
+  }
 
   tp->root = pool_get(tp);
   return tp;
 }
 
+static inline void
+node_init(struct cc_node* node) {
+  node->ud_slot.p = NULL;
+  node->ud_slot.tmp = 0;
+  node->ud_slot.len = 1;
+  node->ud_slot.pos = 0;
+}
+
+static void
+node_addud(struct cc_node* node, unsigned int ud) {
+  if(node->ud_slot.pos==0) {
+    if(node->ud_slot.p == NULL) {
+      node->ud_slot.tmp = ud;
+      node->ud_slot.pos++;
+      return;
+    }
+  }else if(node->ud_slot.p == NULL) {
+    assert(node->ud_slot.pos == 1 && node->ud_slot.len == 1);
+    node->ud_slot.p = (unsigned int*)malloc(sizeof(unsigned int)*2);
+    node->ud_slot.p[0] = node->ud_slot.tmp;
+    node->ud_slot.len = 2;
+  }
+
+  if(node->ud_slot.pos >= node->ud_slot.len) {
+    assert((node->ud_slot.len & 0x80000000) == 0); // check overflow
+    uint32_t sz = node->ud_slot.len * 2;
+    node->ud_slot.p = (unsigned int*)realloc(node->ud_slot.p, sizeof(unsigned int)*sz);
+    node->ud_slot.len = sz;
+  }
+
+   node->ud_slot.p[node->ud_slot.pos] = ud;
+   (node->ud_slot.pos)++;
+}
+
 
 void
 cc_trie_free(struct cc_trie* tp) {
+  uint32_t i;
+  for(i=0; i<tp->pool.size; i++) {
+    struct cc_node* node = tp->pool.p + i;
+    if(node->ud_slot.p) {
+      free(node->ud_slot.p);
+    }
+  }
   free(tp->pool.p);
   free(tp);
 }
@@ -85,12 +137,6 @@ cc_trie_clear(struct cc_trie* tp) {
   tp->root = pool_get(tp);
 }
 
-size_t
-cc_trie_size(struct cc_trie* tp) {
-  size_t header = sizeof(*tp);
-  size_t pool_size = sizeof(struct cc_node)*tp->pool.size;
-  return header + pool_size;
-}
 
 void
 cc_trie_insert(struct cc_trie* tp, const char* str, unsigned int ud) {
@@ -105,16 +151,17 @@ cc_trie_insert(struct cc_trie* tp, const char* str, unsigned int ud) {
   }
 
   struct cc_node* node = pos2node(tp, cur_pos);
-  node->ud = ud;
-  node->has_ud = true;
+  node_addud(node, ud);
 }
 
 static void
 _dump_node(struct cc_trie* tp, struct cc_node* root, trie_visit func, void* ud) {
   int i;
-  if(root->has_ud) {
-    func(root->ud, ud);
-  }
+   for(i=0; i<root->ud_slot.pos; i++) {
+    unsigned int *p = root->ud_slot.p;
+    unsigned int v  = (p)?(p[i]):(root->ud_slot.tmp);
+    func(v, ud);
+   }
 
   for(i=0; i<root->count; i++){
     int idx = root->list[i];
@@ -140,16 +187,22 @@ cc_trie_match(struct cc_trie* tp, const char* prefix, trie_visit func, void* ud)
 
 static uint32_t
 pool_get(struct cc_trie* tp) {
-  if(tp->pool.pos >= tp->pool.size) {
+  size_t sz = tp->pool.size;
+  if(tp->pool.pos >= sz) {
+    size_t i;
     assert((tp->pool.size & 0x80000000) == 0);  // is overflow
     tp->pool.size *= 2;
     tp->pool.p = (struct cc_node*)realloc(tp->pool.p, sizeof(struct cc_node)*tp->pool.size);
+    for(i=sz; i<tp->pool.size; i++) {
+      struct cc_node* node = tp->pool.p + i;
+      node_init(node);
+    }
   }
 
   struct cc_node* node = &(tp->pool.p[tp->pool.pos]);
   memset(node->childs, 0, sizeof(node->childs));
   node->count = 0;
-  node->has_ud = false;
+  node->ud_slot.pos = 0;
   return ++(tp->pool.pos);
 }
 
@@ -184,7 +237,8 @@ node_insert(struct cc_trie* tp, uint32_t node_pos, char c) {
 // for test
 static void
 _tdump(struct cc_trie* tp, struct cc_node* node, uint32_t pos) {
-  printf("pos[%d] count[%d] ud[%d] has_ud[%d]\n", pos, node->count, node->ud, node->has_ud);
+  printf("pos[%d] count[%d] ud_p[%p] ud_pos[%d] ud_len[%d]\n", pos, node->count, 
+    node->ud_slot.p, node->ud_slot.pos, node->ud_slot.len);
   int i=0;
   for(i=0; i<node->count; i++) {
     int idx = node->list[i];
