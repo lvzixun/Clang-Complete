@@ -33,6 +33,7 @@ src/cc_result.c \
 src/cc_resultcache.c \
 src/cc_symbol.c \
 src/cc_trie.c \
+src/cc_log.c \
 src/py_bind.c
 
 
@@ -42,7 +43,7 @@ all: cc_lib
 linux: linux_config cc_lib
 
 linux_config:
-	sudo apt-get install clang
+	sudo apt-get install clang-3.5
 	sudo ln -sf /usr/lib/llvm-3.5/lib/libclang-3.5.so.1 ./lib/libclang.so
 
 cc_lib: $(FILES)
