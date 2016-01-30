@@ -164,6 +164,35 @@ class Complete(object):
     project_settings = view.settings()
     include_opts = settings.get("include_options", []) + project_settings.get("cc_include_options", [])
 
+    # seach for .clang_complete file and add lines to options
+    target_file = ".clang_complete"
+    directory = os.path.dirname(view.file_name())
+    path = os.path.join(directory, target_file)
+    target_exists = False
+
+    # search up the tree from the active file
+    i = 0
+    while(directory != os.path.dirname(directory) and i < 15):
+      target_exists = os.path.isfile(path)
+      if target_exists == True:
+        break;
+      directory = os.path.dirname(directory)
+      path = os.path.join(directory, target_file)
+      i = i + 1
+
+    if os.path.isfile(path) == True:
+      print("adding options from ", path)
+
+      lines = [line.rstrip('\n') for line in open(path)]
+
+      # resolve relative paths in options
+      for line in lines:
+        m = re.match("(-I)([^$]+)", line)
+        if m != None and os.path.isabs(m.group(2)) == False:
+          absOptPath = os.path.join(os.path.dirname(path), m.group(2))
+          line = m.group(1) + absOptPath
+        include_opts = include_opts + [line]
+
     window = sublime.active_window()
     variables = window.extract_variables()
     include_opts = sublime.expand_variables(include_opts, variables)
