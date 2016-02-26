@@ -14,7 +14,7 @@
 
     // add include options to clang
     // this can also be specified as project specific options.
-    // add somthing like the following to the `sttings` section in your `<name>.sublime-project` file:
+    // add something like the following to the `settings` section in your `<name>.sublime-project` file:
     // 
     // 
     //     
