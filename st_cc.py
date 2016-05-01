@@ -34,6 +34,12 @@ def can_complete(view):
   return language in drivers
 
 
+def should_be_filtered(err, filters):
+  for filter in filters:
+    if re.search(filter, err) is not None:
+      return True
+  return False
+
 class WraperComplete(object):
 
   def __init__(self):
@@ -159,9 +165,10 @@ class Complete(object):
   @staticmethod
   def get_opt(view):
     settings = Complete.get_settings()
-    additional_lang_opts = settings.get("additional_language_options", {})
-    language = get_language(view)
     project_settings = view.settings()
+    additional_lang_opts = settings.get("additional_language_options", {})
+    additional_lang_opts.update(project_settings.get("cc_additional_language_options", {}))
+    language = get_language(view)
     include_opts = settings.get("include_options", []) + project_settings.get("cc_include_options", [])
 
     window = sublime.active_window()
@@ -265,14 +272,16 @@ class CCAutoComplete(sublime_plugin.EventListener):
       })
     sublime.set_timeout(hack2, 1)
 
-
   def on_post_save_async(self, view):
     if not can_complete(view):
       return 
 
     settings = Complete.get_settings()
+    project_settings = view.settings()
     hide_error_panel = settings.get('hide_error_panel') or False
+    hide_error_panel_when_empty = settings.get('hide_error_panel_when_empty') or False
     hide_error_mark = settings.get('hide_error_mark') or False
+    filters = settings.get('display_filters', []) + project_settings.get('cc_display_filters', [])
     file_name = view.file_name()
     sym = Complete.get_symbol(file_name, view)
     if self.dirty:
@@ -280,15 +289,18 @@ class CCAutoComplete(sublime_plugin.EventListener):
     self.dirty = False
     digst = sym.diagnostic()
     
-    output = "\n".join([err for _, (_, _, _, _, err) in digst])
+    output = "\n".join([err for _, (_, _, _, _, err) in digst if not should_be_filtered(err, filters)])
     clang_error_panel.set_data(output)
-    clang_error_panel.error_marks(view, digst, not hide_error_mark)
+    clang_error_panel.error_marks(view, digst, not hide_error_mark, should_be_filtered, filters)
 
     if output:
       print(output)
     window = view.window()
-    if not window is None and len(digst) >= 1:
-      window.run_command("clang_toggle_panel", {"show": not hide_error_panel})
+    if not window is None:
+      if output:
+        window.run_command("clang_toggle_panel", {"show": not hide_error_panel})
+      elif hide_error_panel_when_empty:
+        window.run_command("clang_toggle_panel", {"show": False})
 
   
   def on_query_completions(self, view, prefix, locations):

@@ -78,6 +78,11 @@ Example settings for Windows:
 if `"cc_include_options"` exists in your project settings, it will merge to
 the `"include_options"` defined in `cc.sublime-settings`.
 
+if `"cc_additional_language_options"` exists in your project settings, it will merge to
+the `"additional_language_options"` defined in `cc.sublime-settings`.
+
+if `"cc_display_filters"` exists in exists in your project settings, it will merge to
+the `"display_filters"` defined in `cc.sublime-settings`.
 
 ## Preview
 <img src="http://ww4.sinaimg.cn/large/7608d17fgw1eo4dgrggc0g20da0bi44p.gif" width="50%" />

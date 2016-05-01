@@ -64,12 +64,14 @@ class ClangErrorPanel(object):
         sublime.active_window().run_command("hide_panel", {"panel": "output.cc"})
 
 
-    def error_marks(self, view, digst, display):
+    def error_marks(self, view, digst, display, filterfn, filters):
         self.erase_error_marks(view)
 
         cur_filename = view.file_name()
         outlines = {'warning': [], 'error': [], 'fatal error': []}
         for i, (filename, line, col, error_type, info) in digst:
+            if filterfn(info, filters):
+                continue
             print(error_type, line)
             if error_type in outlines and cur_filename == filename:
                 outlines[error_type].append(view.full_line(view.text_point(line-1, 0)))
