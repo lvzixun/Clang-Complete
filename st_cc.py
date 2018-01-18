@@ -271,8 +271,9 @@ class CCAutoComplete(sublime_plugin.EventListener):
       return 
 
     settings = Complete.get_settings()
-    hide_error_panel = settings.get('hide_error_panel') or False
-    hide_error_mark = settings.get('hide_error_mark') or False
+    project_settings = view.settings()
+    hide_error_panel = settings.get('hide_error_panel') or project_settings.get('cc_hide_error_panel') or False
+    hide_error_mark = settings.get('hide_error_mark') or project_settings.get('cc_hide_error_mark') or False
     file_name = view.file_name()
     sym = Complete.get_symbol(file_name, view)
     if self.dirty:
