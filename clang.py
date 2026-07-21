@@ -113,7 +113,7 @@ class CXCursorKind(Enum):
   # A C++ template type parameter
   TEMPLATE_TYPE_PARAMETER =  27 
 
-  # A C++ non-type template paramater.
+  # A C++ non-type template parameter.
   TEMPLATE_NON_TYPE_PARAMETER =  28 
 
   # A C++ template template parameter.
